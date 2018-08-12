@@ -1,4 +1,20 @@
 class Piece
+  attr_accessor :x_pos, :y_pos
+  attr_reader   :color, :moves
+
+  def initialize(color, position)
+    @color = color
+    @moves = []
+    @x_pos = position[0]
+    @y_pos = position[1]
+  end
+
+  def is_valid?
+    true
+    # if move is within moves and is within board
+    # return true
+    # else return false
+  end
 =begin
   On new,
     takes position and color
