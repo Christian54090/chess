@@ -1,3 +1,4 @@
+# lib/chess.rb
 require './pieces.rb'
 require './bishop.rb'
 require './knight.rb'
@@ -31,8 +32,8 @@ class Chess
   end
 
   def move(pos,tar)
-    pos.convert == 'invalid' ? return 'invalid' : pos = pos.convert
-    tar.convert == 'invalid' ? return 'invalid' : tar = tar.convert
+    pos.convert == 'invalid' ? (return 'invalid') : pos = pos.convert
+    tar.convert == 'invalid' ? (return 'invalid') : tar = tar.convert
 
     if @board[pos[0]][pos[1]].is_valid?(pos,tar) && tar.in_bounds?
       if tar.clear?
@@ -51,8 +52,8 @@ class Chess
            'E' => 5, 'F' => 6, 'G' => 7, 'H' => 8}
 
     arr = string.split("")
-    if ('A'..'H').to_a.include?(arr[0]) && (1..8).include?(arr[1])
-      return [lib[arr[1]*2], arr[0]*2]
+    if ('A'..'H').include?(arr[0]) && (1..8).include?(arr[1])
+      return [arr[1]+1,lib[arr[0]*2]]
     else
       return "invalid"
     end
@@ -78,12 +79,13 @@ class Chess
     puts @board[7]
     puts @board[8]
 
-    @turns % 2 != 0 ? (turn = "B's turn"; col = 'b') : (turn = "W's turn"; col = 'w')
+    @turns % 2 != 0 ? (turn = "Black's turn"; col = 'b')
+                    : (turn = "White's turn"; col = 'w')
 
     puts turn; puts "Example input: A2 A3"
-    p '> '; choice = $stdin.gets.chomp.upcase.split
+    p '> '; choice = gets.chomp.upcase.split
     if choice.include?('SAVE')
-      save_game
+#      save_game
     elsif choice.length != 2
       puts "Invalid choice"; game
     else
@@ -100,7 +102,21 @@ class Chess
         end
       end
     end
-
+=begin
+    case choice
+    when choice.include?('SAVE')                then save_game; game
+    when choice.include?('QUIT')                then quit_game
+    when choice.length != 2                     then puts "Invalid choice"; game
+    when move(choice[0],choice[1]) == 'invalid' then puts "Invalid choice"; game
+    when @board[choice[0].convert[0]][choice[0].convert[1]] == ' '
+      puts "You cannot move an empty space!"; game
+    when @board[choice[0].convert[0]][choice[0].convert[1]].color != col
+      puts "You cannot move the other team's piece!"; game
+    else
+      move(choice[0],choice[1])
+      @turns += 1; game
+    end
+=end
   end
 
 =begin
