@@ -3,14 +3,17 @@ class Piece
   attr_reader   :color, :moves
 
   def initialize(color, position)
-    @color = color
     @moves = []
+    @color = color
     @x_pos = position[0]
     @y_pos = position[1]
   end
 
-  def is_valid?
-    true
+  def is_valid?(pos,tar)
+    res = []
+    res << (pos[0] - tar[0])
+    res << (pos[1] - tar[1])
+    @moves.include?(res)
     # if move is within moves and is within board
     # return true
     # else return false
