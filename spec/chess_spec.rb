@@ -4,7 +4,7 @@ require 'pieces'
 
 describe Chess do
 
-  describe 'convert' do
+  describe '.convert' do
 
     context "given an invalid string" do
       it { expect(Chess.convert('Z5')).to eql('invalid') }
@@ -15,21 +15,28 @@ describe Chess do
     end
 
   end
-=begin
-  describe 'clear?' do
 
-  end
 
-  describe 'in_bounds?' do
+  describe '.in_bounds?' do
 
     context 'given an invalid array' do
-      it { expect(in_bounds?([9,1])).to eql(false) }
+      it { expect(Chess.in_bounds?([9,1])).to eql(false) }
     end
 
     context 'given a valid array' do
-      it { expect(in_bounds?([1,1])).to eql(true) }
+      it { expect(Chess.in_bounds?([1,8])).to eql(true) }
     end
 
   end
+
+  describe '.piece_shown'
+
+    context 'given a knight' do
+      it { expect(Chess::piece_shown([4,2])).to eql(Knight.new('b')) }
+    end
+
+  end
+
+=begin
 =end
 end

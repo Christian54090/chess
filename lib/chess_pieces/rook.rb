@@ -1,8 +1,8 @@
-require './pieces.rb'
+require './lib/pieces.rb'
 
 class Rook < Piece
 
-  def initialize(color, position)
+  def initialize(color)
     @moves = [[0,1],[0,-1],[1,0],[-1,0],[0,2],[0,-2],[2,0],[-2,0],
               [0,3],[0,-3],[3,0],[-3,0],[0,4],[0,-4],[4,0],[-4,0],
               [0,5],[0,-5],[5,0],[-5,0],[0,6],[0,-6],[6,0],[-6,0],
@@ -11,7 +11,7 @@ class Rook < Piece
   end
 
   def piece
-    @color == 'w' ? '\u2657' : '\u265D'
+    @color == 'w' ? "\u2656" : "\u265C"
   end
 
 end

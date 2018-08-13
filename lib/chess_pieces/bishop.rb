@@ -1,8 +1,8 @@
-require './pieces.rb'
+require './lib/pieces.rb'
 
 class Bishop < Piece
 
-  def initialize(color, position)
+  def initialize(color)
     @moves = [[1,1],[1,-1],[-1,1],[-1,-1],[2,2],[2,-2],[-2,2],[-2,-2],
               [3,3],[3,-3],[-3,3],[-3,-3],[4,4],[4,-4],[-4,4],[-4,-4],
               [5,5],[5,-5],[-5,5],[-5,-5],[6,6],[6,-6],[-6,6],[-6,-6],
@@ -11,7 +11,7 @@ class Bishop < Piece
   end
 
   def piece
-    @color == 'w' ? '\u2657' : '\u265D'
+    @color == 'w' ? "\u2657" : "\u265D"
   end
 
 end

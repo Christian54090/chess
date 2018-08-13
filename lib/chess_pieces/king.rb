@@ -1,14 +1,14 @@
-require './pieces.rb'
+require './lib/pieces.rb'
 
 class King < Piece
 
-  def initialize(color, position)
+  def initialize(color)
     @moves = [[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]
     super
   end
 
   def piece
-    @color == 'w' ? '\u2654' : '\u265A'
+    @color == 'w' ? "\u2654" : "\u265A"
   end
 
 end

@@ -1,17 +1,19 @@
 # lib/chess.rb
-require './pieces.rb'
-require './bishop.rb'
-require './knight.rb'
-require './queen.rb'
-require './rook.rb'
-require './pawn.rb'
-require './king.rb'
+require 'yaml'
+require_relative 'pieces'
+require_relative 'chess_pieces/king'
+require_relative 'chess_pieces/pawn'
+require_relative 'chess_pieces/rook'
+require_relative 'chess_pieces/queen'
+require_relative 'chess_pieces/knight'
+require_relative 'chess_pieces/bishop'
+
 
 class Chess
   attr_accessor :turns, :board
 
   def initialize
-    @turns = 1
+    @turns = 0
     @board = [[' ','A',' ','B',' ','C',' ','D',' ','E',' ','F',' ','G',' ','H'],
               ['1',Rook.new('b').piece,' ',Knight.new('b').piece,' ',Bishop.new('b').piece, ' ', Queen.new('b').piece,
                ' ',King.new('b').piece,' ',Bishop.new('b').piece,' ',Knight.new('b').piece, ' ',Rook.new('b').piece],
@@ -23,19 +25,16 @@ class Chess
               ['6',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
               ['7',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,
                ' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece],
-              ['8',Rook.new('w').piece,' ',Knight.new('w').piece,' ',Bishop.new('b').piece, ' ', Queen.new('b').piece,
-               ' ',King.new('w').piece,' ',Bishop.new('w').piece,' ',Knight.new('b').piece, ' ',Rook.new('b').piece]]
-  end
-
-  def is_black?
-    @color == 'black'
+              ['8',Rook.new('w').piece,' ',Knight.new('w').piece,' ',Bishop.new('w').piece, ' ', Queen.new('w').piece,
+               ' ',King.new('w').piece,' ',Bishop.new('w').piece,' ',Knight.new('w').piece, ' ',Rook.new('w').piece]]
   end
 
   def move(pos,tar)
-    pos.convert == 'invalid' ? (return 'invalid') : pos = pos.convert
-    tar.convert == 'invalid' ? (return 'invalid') : tar = tar.convert
+    return 'invalid' if in_bounds?(tar.split(""))
+    convert(pos) == 'invalid' ? (return 'invalid') : pos = convert(pos)
+    convert(tar) == 'invalid' ? (return 'invalid') : tar = convert(tar)
 
-    if @board[pos[0]][pos[1]].is_valid?(pos,tar) && tar.in_bounds?
+    if piece_shown(pos).is_valid?(pos,tar)
       if tar.clear?
         @board[tar[0]][tar[1]] = @board[pos[0]][pos[1]]
         @board[pos[0]][pos[1]] = ' '
@@ -43,7 +42,29 @@ class Chess
         return 'blocked'
       end
     else
+      show = @board[pos[0]][pos[1]]
+      print show
       return 'invalid'
+    end
+  end
+
+  def piece_shown(pos)
+    pos = @board[pos[0]][pos[1]]
+
+    case pos
+    when pos == Pawn.new('w').piece then return Pawn.new('w')
+    when pos == Pawn.new('b').piece then return Pawn.new('b')
+    when pos == King.new('w').piece then return King.new('w')
+    when pos == King.new('b').piece then return King.new('b')
+    when pos == Rook.new('w').piece then return Rook.new('w')
+    when pos == Rook.new('b').piece then return Rook.new('b')
+    when pos == Queen.new('w').piece then return Queen.new('w')
+    when pos == Queen.new('b').piece then return Queen.new('b')
+    when pos == Knight.new('w').piece then return Knight.new('w')
+    when pos == Knight.new('b').piece then return Knight.new('b')
+    when pos == Bishop.new('w').piece then return Bishop.new('w')
+    when pos == Bishop.new('b').piece then return Bishop.new('b')
+    else                 return ' '
     end
   end
 
@@ -52,57 +73,39 @@ class Chess
            'E' => 5, 'F' => 6, 'G' => 7, 'H' => 8}
 
     arr = string.split("")
-    if ('A'..'H').include?(arr[0]) && (1..8).include?(arr[1])
-      return [arr[1]+1,lib[arr[0]*2]]
+    if ('A'..'H').include?(arr[0]) && (1..8).include?(arr[1].to_i)
+      return [arr[1].to_i,(lib[arr[0]] * 2) - 1]
     else
       return "invalid"
     end
   end
 
-  def clear?(tar)
-    (@board[tar[0]][tar[1]] == ' ' ||
-     @board[pos[0]][pos[1]].color != @board[tar[0]][tar[1]].color)
+  def clear?(pos,tar)
+    (piece_shown(tar) == ' ' || piece_shown(pos).color != piece_shown(tar).color)
   end
 
   def in_bounds?(tar)
-    tar.each{|t| t.between?(1, 8) }
+    ('A'..'H').include?(tar[0]) && (1..8).include?(tar[1])
   end
 
   def game
-    puts @board[0]
-    puts @board[1]
-    puts @board[2]
-    puts @board[3]
-    puts @board[4]
-    puts @board[5]
-    puts @board[6]
-    puts @board[7]
-    puts @board[8]
+    @board[0].each{|a| print a }; puts " "
+    @board[1].each{|a| print a }; puts " "
+    @board[2].each{|a| print a }; puts " "
+    @board[3].each{|a| print a }; puts " "
+    @board[4].each{|a| print a }; puts " "
+    @board[5].each{|a| print a }; puts " "
+    @board[6].each{|a| print a }; puts " "
+    @board[7].each{|a| print a }; puts " "
+    @board[8].each{|a| print a }; puts " "
 
-    @turns % 2 != 0 ? (turn = "Black's turn"; col = 'b')
-                    : (turn = "White's turn"; col = 'w')
+    @turns % 2 != 0 ? (turn = "Black's turn, "; col = 'b')
+                    : (turn = "White's turn, "; col = 'w')
 
-    puts turn; puts "Example input: A2 A3"
-    p '> '; choice = gets.chomp.upcase.split
-    if choice.include?('SAVE')
-#      save_game
-    elsif choice.length != 2
-      puts "Invalid choice"; game
-    else
-      if move(choice[0],choice[1]) == 'invalid'
-        puts "Invalid choice"; game
-      else
-        if @board[choice[0].convert[0]][choice[0].convert[1]] == ' '
-          puts "You cannot move an empty space!"; game
-        elsif @board[choice[0].convert[0]][choice[0].convert[1]].color != col
-          puts "You cannot move the other team's piece!"; game
-        else
-          move(choice[0],choice[1])
-          @turns += 1; game
-        end
-      end
-    end
-=begin
+    puts "\nAt any point, type 'save' or 'quit' for those actions"
+    print turn; puts "Example input: A2 A3"
+    print '> '; choice = gets.chomp.upcase.split
+
     case choice
     when choice.include?('SAVE')                then save_game; game
     when choice.include?('QUIT')                then quit_game
@@ -116,8 +119,60 @@ class Chess
       move(choice[0],choice[1])
       @turns += 1; game
     end
-=end
   end
+
+  def checkmate?(color)
+    color == 'b' ? (anti = 'w') : (anti = 'b')
+    quit_game("Checkmate!") if @board.include?(King.new(anti))
+  end
+
+  def stalemate?
+    other = [Pawn.new('b'),Rook.new('b'),Queen.new('b'),Knight.new('b'),Bishop.new('b'),
+             Pawn.new('w'),Rook.new('w'),Queen.new('w'),Knight.new('w'),Bishop.new('w')]
+    quit_game("Stalemate!") if other.select{|n| @board.include?(n)}.length == 0
+  end
+
+  def main_menu
+    puts "Please choose a number"
+    puts "---------------"
+    puts "[1] New Game\n[2] Load Game\n[3] Quit"
+    puts "---------------"
+
+    print '> '; choice = gets.chomp.to_i
+    case choice
+    when [1].include?(choice) then new_game
+    when [1].include?(choice) then load_game
+    when [1].include?(choice) then quit_game
+    else                     puts "Hint: Pick from the numbers"; main_menu
+    end
+  end
+
+  def new_game
+    chess = Chess.new
+    game
+  end
+
+  def save_game
+    File.open("saves/game.yaml", 'w'){ |file| file.write(YAML::dump(self)) }
+    puts "Game has been saved!"
+  end
+
+  def load_game
+    if File.exist?("saves/game.yaml")
+      save = YAML::load(File.read("saves/game.yaml"))
+      @board = save.board
+      puts "Welcome back!"; game
+    else
+      puts "No saved files exist"; main_menu
+    end
+  end
+
+
+  def quit_game(string="")
+    puts string
+    exit(0)
+  end
+
 
 =begin
   On new,
@@ -168,3 +223,6 @@ class Chess
 
 =end
 end
+
+game = Chess.new
+game.game
