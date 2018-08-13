@@ -1,4 +1,10 @@
 require './pieces.rb'
+require './bishop.rb'
+require './knight.rb'
+require './queen.rb'
+require './rook.rb'
+require './pawn.rb'
+require './king.rb'
 
 class Chess
   attr_accessor :turns, :board
@@ -6,18 +12,18 @@ class Chess
   def initialize
     @turns = 1
     @board = [[' ','A',' ','B',' ','C',' ','D',' ','E',' ','F',' ','G',' ','H'],
-              ['1',Rook.new('b',[1,1]).piece,' ',Knight.new('b',[2,1]).piece,' ',Bishop.new('b',[1,1]).piece, ' ', King.new('b',[1,1]).piece,
-               ' ',Queen.new('b',[1,1]).piece,' ',Bishop.new('b',[1,1]).piece,' ',Knight.new('b',[1,1]).piece, ' ',Rook.new('b',[1,1]).piece],
-              ['2',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,
-               ' ',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,' ',Pawn.new('b',[1,2]).piece,],
+              ['1',Rook.new('b').piece,' ',Knight.new('b').piece,' ',Bishop.new('b').piece, ' ', Queen.new('b').piece,
+               ' ',King.new('b').piece,' ',Bishop.new('b').piece,' ',Knight.new('b').piece, ' ',Rook.new('b').piece],
+              ['2',Pawn.new('b').piece,' ',Pawn.new('b').piece,' ',Pawn.new('b').piece,' ',Pawn.new('b').piece,
+               ' ',Pawn.new('b').piece,' ',Pawn.new('b').piece,' ',Pawn.new('b').piece,' ',Pawn.new('b').piece],
               ['3',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
               ['4',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
               ['5',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
               ['6',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-              ['7',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,
-               ' ',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,' ',Pawn.new('w',[1,2]).piece,],
-              ['8',Rook.new('b',[1,1]).piece,' ',Knight.new('b',[2,1]).piece,' ',Bishop.new('b',[1,1]).piece, ' ', King.new('b',[1,1]).piece,
-               ' ',Queen.new('b',[1,1]).piece,' ',Bishop.new('b',[1,1]).piece,' ',Knight.new('b',[1,1]).piece, ' ',Rook.new('b',[1,1]).piece]]
+              ['7',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,
+               ' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece,' ',Pawn.new('w').piece],
+              ['8',Rook.new('w').piece,' ',Knight.new('w').piece,' ',Bishop.new('b').piece, ' ', Queen.new('b').piece,
+               ' ',King.new('w').piece,' ',Bishop.new('w').piece,' ',Knight.new('b').piece, ' ',Rook.new('b').piece]]
   end
 
   def is_black?
@@ -25,32 +31,76 @@ class Chess
   end
 
   def move(pos,tar)
-    if tar.convert.is_valid? && tar.convert.in_bounds?
-#      if tar.clear?
-#        @board[tar[0]*2][tar[1]*2] = @board[pos[0]*2][pos[1]*2]
-#        @board[pos[0]*2][pos[1]*2] = ' '
-#      else
-#        return 'blocked'
-#      end
+    pos.convert == 'invalid' ? return 'invalid' : pos = pos.convert
+    tar.convert == 'invalid' ? return 'invalid' : tar = tar.convert
+
+    if @board[pos[0]][pos[1]].is_valid?(pos,tar) && tar.in_bounds?
+      if tar.clear?
+        @board[tar[0]][tar[1]] = @board[pos[0]][pos[1]]
+        @board[pos[0]][pos[1]] = ' '
+      else
+        return 'blocked'
+      end
     else
-#      return 'invalid'
+      return 'invalid'
     end
   end
 
   def convert(string)
-    return string
-#    lib = {'A' => 1, 'B' => 2, 'C' => 3, 'D' => 4,
-#           'E' => 5, 'F' => 6, 'G' => 7, 'H' => 8}
-#    return [lib[string.split("")[1]], string.split("")[0]]
+    lib = {'A' => 1, 'B' => 2, 'C' => 3, 'D' => 4,
+           'E' => 5, 'F' => 6, 'G' => 7, 'H' => 8}
+
+    arr = string.split("")
+    if ('A'..'H').to_a.include?(arr[0]) && (1..8).include?(arr[1])
+      return [lib[arr[1]*2], arr[0]*2]
+    else
+      return "invalid"
+    end
   end
 
-  def clear?(pos)
-#    if coords in array dont have anything then return true
-#    if they do then if it shares the same color return 'friend' else return 'enemy'
+  def clear?(tar)
+    (@board[tar[0]][tar[1]] == ' ' ||
+     @board[pos[0]][pos[1]].color != @board[tar[0]][tar[1]].color)
   end
 
   def in_bounds?(tar)
     tar.each{|t| t.between?(1, 8) }
+  end
+
+  def game
+    puts @board[0]
+    puts @board[1]
+    puts @board[2]
+    puts @board[3]
+    puts @board[4]
+    puts @board[5]
+    puts @board[6]
+    puts @board[7]
+    puts @board[8]
+
+    @turns % 2 != 0 ? (turn = "B's turn"; col = 'b') : (turn = "W's turn"; col = 'w')
+
+    puts turn; puts "Example input: A2 A3"
+    p '> '; choice = $stdin.gets.chomp.upcase.split
+    if choice.include?('SAVE')
+      save_game
+    elsif choice.length != 2
+      puts "Invalid choice"; game
+    else
+      if move(choice[0],choice[1]) == 'invalid'
+        puts "Invalid choice"; game
+      else
+        if @board[choice[0].convert[0]][choice[0].convert[1]] == ' '
+          puts "You cannot move an empty space!"; game
+        elsif @board[choice[0].convert[0]][choice[0].convert[1]].color != col
+          puts "You cannot move the other team's piece!"; game
+        else
+          move(choice[0],choice[1])
+          @turns += 1; game
+        end
+      end
+    end
+
   end
 
 =begin
